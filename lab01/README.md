@@ -1,21 +1,16 @@
-  # **Lab01 - Sumador/Restador de 4 bits**
+# Lab01 - Sumador/Restador de 4 bits
 
-# **Integrantes**
+## Integrantes
 
-- [Juan Diego Cervantes Guio](https://github.com/juandicervantesgu-dev)
-- [<!-- Remplace aquí nombre 2. -->](<!-- Link GitHub -->)
-- [<!-- Remplace aquí nombre 3. -->](<!-- Link GitHub -->)
+* [Juan Diego Cervantes Guio](https://github.com/juandicervantesgu-dev)
+* [<!-- Remplace aqui nombre 2. -->](<!-- Remplace aqui link de usuario 2 de github -->)
+* [<!-- Remplace aqui nombre 3. -->](<!-- Remplace aqui link de usuario 3 de github -->)
 
----
-
-# informe
-
-## Indice
+### Índice
 
 1. [Fundamentos teóricos](#fundamentos-teóricos)
-2. [Documentación del diseño implementado](#documentación-del-diseño-implementado)
+2. [Documentación del diseño](#documentación-del-diseño)
 3. [Simulaciones](#simulaciones)
 4. [Evidencias de implementación](#evidencias-de-implementación)
-5. [Preguntas](#preguntas)
-6. [Conclusiones](#conclusiones)
-7. [Referencias](#referencias)
+5. [Conclusiones](#conclusiones)
+6. [Referencias](#referencias)
