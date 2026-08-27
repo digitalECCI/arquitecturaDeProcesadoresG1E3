@@ -60,3 +60,19 @@ También podemos encontrar:
 * *32 bits* = 4 bytes.
 
 En este laboratorio trabajamos principalmente con números de **4 bits**.
+Ahora se abordara sobre el sistema binario, factor muy importante para la descripción e implementación de hardware en Quartus.
+
+Únicamente utiliza:
+
+```text
+0 y 1
+```
+
+Cada posición tiene un valor correspondiente a una potencia de 2.
+
+Por ejemplo:
+| **Concepto** | **Bit 3** | **Bit 2** | **Bit 1** | **Bit 0** |
+|:---:|:---:|:---:|:---:|:---:|
+| **Binario** | 1 | 0 | 1 | 1 |
+| **Posición** | 3 | 2 | 1 | 0 |
+| **Valor** | 8 | 4 | 2 | 1 |
