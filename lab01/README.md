@@ -3,8 +3,9 @@
 ## Integrantes
 
 * [Juan Diego Cervantes Guio](https://github.com/juandicervantesgu-dev)
-* [<!-- Remplace aqui nombre 2. -->](<!-- Remplace aqui link de usuario 2 de github -->)
-* [<!-- Remplace aqui nombre 3. -->](<!-- Remplace aqui link de usuario 3 de github -->)
+* [Juan Sebastian Guerrero Gualteros](https://github.com/juanseguerrerogu07)
+* [Samuel Esteban Jaime Gutierrez](https://github.com/Samueljgest) 
+
 
 ### Índice
 
@@ -14,3 +15,48 @@
 4. [Evidencias de implementación](#evidencias-de-implementación)
 5. [Conclusiones](#conclusiones)
 6. [Referencias](#referencias)
+# Fundamentos teóricos
+
+## ¿Qué es un bit?
+
+Un **bit** (*Binary Digit*) es la unidad más pequeña de información utilizada en los sistemas digitales.
+
+Un bit solamente puede tomar dos valores:
+
+* `0` → Estado lógico bajo.
+* `1` → Estado lógico alto.
+
+Al combinar varios bits podemos representar una mayor cantidad de números.
+
+Por ejemplo, con **4 bits** tenemos:
+
+```text
+0000 → 0
+0001 → 1
+0010 → 2
+...
+1111 → 15
+```
+
+En total existen:
+
+```text
+2^4 = 16 combinaciones
+```
+
+## ¿Qué es un byte?
+
+Un **byte** corresponde a un conjunto de **8 bits**.
+
+```text
+1 Byte = 8 bits
+```
+
+También podemos encontrar:
+
+* *4 bits* = 1 nibble.
+* *8 bits* = 1 byte.
+* *16 bits* = 2 bytes.
+* *32 bits* = 4 bytes.
+
+En este laboratorio trabajamos principalmente con números de **4 bits**.
