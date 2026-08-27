@@ -76,3 +76,110 @@ Por ejemplo:
 | **Binario** | 1 | 0 | 1 | 1 |
 | **Posición** | 3 | 2 | 1 | 0 |
 | **Valor** | 8 | 4 | 2 | 1 |
+Entonces:
+
+```text
+1011₂ = 8 + 0 + 2 + 1
+
+1011₂ = 11₁₀
+```
+
+## Suma binaria
+
+La **suma binaria** funciona de manera similar a la suma decimal, pero solamente utiliza `0` y `1`.
+
+Las operaciones básicas son:
+| **A** | **B** | **Suma** | **Acarreo** |
+|:-----:|:-----:|:--------:|:-----------:|
+|   0   |   0   |    0     |      0      |
+|   0   |   1   |    1     |      0      |
+|   1   |   0   |    1     |      0      |
+|   1   |   1   |    0     |      1      |
+
+La operación más importante es:
+
+```text
+1 + 1 = 10₂
+```
+
+El `0` corresponde al resultado de la posición actual y el `1` corresponde al **acarreo**.
+
+## ¿Qué es el acarreo?
+
+El **acarreo** (*Carry*) aparece cuando el resultado de una suma necesita un bit adicional.
+
+Por ejemplo:
+
+```text
+  1
++ 1
+---
+ 10
+```
+
+En el laboratorio utilizamos:
+
+* `Ci` → **Carry In** → Acarreo de entrada.
+* `Co` → **Carry Out** → Acarreo de salida.
+
+---
+
+# Documentación del diseño
+
+## 1. Sumador de 1 bit
+
+### 1.1 Descripción
+
+El **sumador completo de 1 bit** permite sumar tres valores:
+
+```text
+A + B + Ci
+```
+
+Sus entradas son:
+
+* `A` → Primer bit.
+* `B` → Segundo bit.
+* `Ci` → Acarreo de entrada.
+
+Sus salidas son:
+
+* `S` → Resultado de la suma.
+* `Co` → Acarreo de salida.
+
+La expresión correspondiente a la suma es:
+
+```text
+S = A XOR B XOR Ci
+```
+
+### 1.2 Código Verilog
+
+El circuito fue desarrollado utilizando **primitivas de Verilog**, específicamente compuertas `XOR`, `AND` y `OR`.
+
+```verilog
+module sumador1b(
+    input A,
+    input B,
+    input Ci,
+    output S,
+    output Co
+);
+
+    wire res;
+    wire res2;
+    wire res3;
+    wire res4;
+
+    xor (res, B, Ci);
+    xor (S, res, A);
+
+    and (res2, A, Ci);
+    or  (res3, A, Ci);
+    and (res4, B, res3);
+    or  (Co, res4, res2);
+
+endmodule
+```
+
+### 1.3 Diagrama
