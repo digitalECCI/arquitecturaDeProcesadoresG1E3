@@ -233,7 +233,7 @@ Por consiguiente, tenemos las evidencias de implementación.
 *Simulación del sumador de 4 bits*
 
 --- 
-En este apartado observamos las evidencias de implementación ya con el programa subido en la _FPGA_, presione a continuación el enlace para abrir un video de Youtube: 
+En este apartado observamos las evidencias de implementación ya con el programa subido en la _FPGA_, luego de haber realizado su debida prueba en el *Test Bench* presione a continuación el enlace para abrir un video de Youtube: 
 - Ejercicio de 1 bit: https://youtube.com/shorts/UTjLHe9uQ_I?feature=share
 - Ejercicio Sumador 4 Bits: https://youtube.com/shorts/g03-NLE0gDQ?feature=share
 - Ejercicio Sumador restador: https://youtube.com/shorts/3y13669jg1g?feature=share
