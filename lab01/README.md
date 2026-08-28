@@ -227,4 +227,34 @@ Por consiguiente, tenemos las evidencias de implementación.
 *Simulación del sumador de 1 bit* 
 
 ---
-En este apartado observamos las evidencias de implementación ya con el programa subido en la -FPGA-
+En este apartado observamos las evidencias de implementación ya con el programa subido en la _FPGA_, presione a continuación el enlace para abrir un video de Youtube: 
+- Ejercicio de 1 bit: https://youtube.com/shorts/UTjLHe9uQ_I?feature=share
+- Ejercicio Sumador 4 Bits: https://youtube.com/shorts/g03-NLE0gDQ?feature=share
+- Ejercicio Sumador restador: https://youtube.com/shorts/3y13669jg1g?feature=share
+- - - 
+# Conclusiones
+
+* Se comprendió el funcionamiento de la **suma binaria** y la generación de acarreos.
+
+* Se desarrolló un **sumador completo de 1 bit** utilizando primitivas de Verilog.
+
+* Mediante la **instanciación** de cuatro sumadores de 1 bit se construyó un **sumador de 4 bits**.
+
+* Se comprendió que el **complemento a 1** consiste en invertir todos los bits de un número.
+
+* Se determinó que el **complemento a 2** se obtiene sumando `1` al complemento a 1.
+
+* Se utilizó la expresión `A + ~B + 1` para realizar la operación de resta utilizando un circuito sumador.
+
+* La señal `sel` permite seleccionar entre las operaciones de **suma y resta**.
+
+* La simulación permite comprobar el funcionamiento del circuito antes de realizar su implementación en la **FPGA MAX 10**.
+
+---
+
+# Referencias
+
+* **Universidad ECCI.** *Arquitectura de Procesadores - Lab 01: Sumador de 1 bit y sumador de 4 bits*.
+* Material suministrado durante las sesiones de **Arquitectura de Procesadores**.
+* Documentación de **Verilog HDL**.
+  
