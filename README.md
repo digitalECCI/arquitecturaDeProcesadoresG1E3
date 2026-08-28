@@ -3,7 +3,7 @@
 Arquitectura de Procesadores - Grupo 1 Equipo 3
 
 ## Descripción
-Este es el repositorio número 3 del la asignatura Arquitectura de Procesadores.
+Hola profe, este es el repositorio número 3 del la asignatura Arquitectura de Procesadores.
 
 ## Integrantes
 * [Juan Diego Cervantes Guio](https://github.com/juandicervantesgu-dev)
