@@ -11,7 +11,7 @@
 
 1. [Fundamentos teóricos](#fundamentos-teóricos)
 2. [Documentación del diseño](#documentación-del-diseño)
-3. [Simulaciones](#simulaciones)
+3. [Diagramas](#diagramas)
 4. [Evidencias de implementación](#evidencias-de-implementación)
 5. [Conclusiones](#conclusiones)
 6. [Referencias](#referencias)
@@ -221,6 +221,7 @@ La entrada **`sel`** funciona como una señal de control que determina la operac
 >
 > De esta manera, el mismo sumador de 4 bits puede utilizarse tanto para **sumar** como para **restar**.
 ### Evidencias de implementación
+--- 
 Por consiguiente, tenemos las evidencias de implementación. 
 ![alt text](image-2.png)
 ---
@@ -257,4 +258,3 @@ En este apartado observamos las evidencias de implementación ya con el programa
 * **Universidad ECCI.** *Arquitectura de Procesadores - Lab 01: Sumador de 1 bit y sumador de 4 bits*.
 * Material suministrado durante las sesiones de **Arquitectura de Procesadores**.
 * Documentación de **Verilog HDL**.
-  
