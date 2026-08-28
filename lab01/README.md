@@ -182,4 +182,49 @@ module sumador1b(
 endmodule
 ```
 
-### 1.3 Diagrama
+### 1.3 Diagramas
+A continuación, se evidenciara los esquematicos implementados para realizar el laboratorio usando la logica digital y compuertas.
+![alt text](image-1.png)
+
+### **Selección de operación**
+
+La entrada **`sel`** funciona como una señal de control que determina la operación que realizará el circuito.
+
+> **`sel = 0` — SUMA**
+>
+> El circuito mantiene el valor original de `B` y realiza:
+>
+> ```text
+> A + B
+> ```
+
+> **`sel = 1` — RESTA**
+>
+> El circuito obtiene el complemento a 2 de `B` y realiza:
+>
+> ```text
+> A + (~B) + 1
+> ```
+
+| **Señal `sel`** | **Operación** | **Valor de B** | **Ci** | **Resultado** |
+|:---:|:---:|:---:|:---:|:---:|
+| `0` | **SUMA** | `B` | `0` | `A + B` |
+| `1` | **RESTA** | `~B` | `1` | `A + (~B) + 1` |
+
+---
+
+> **Nota importante**
+>
+> Durante la resta, el circuito aprovecha el **complemento a 2** para convertir la operación de resta en una suma:
+>
+> **`A - B = A + (~B) + 1`**
+>
+> De esta manera, el mismo sumador de 4 bits puede utilizarse tanto para **sumar** como para **restar**.
+### Evidencias de implementación
+Por consiguiente, tenemos las evidencias de implementación. 
+![alt text](image-2.png)
+---
+*Simulación del sumador de 1 bit* 
+
+---
+En este apartado observamos las evidencias de implementación ya con el programa subido en la -FPGA-
