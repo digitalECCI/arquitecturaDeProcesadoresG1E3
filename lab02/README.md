@@ -1,4 +1,4 @@
-# Lab01 - Sumador/Restador de 4 bits
+# Lab02 - Sumador/Restador de 4 bits
 
 ## Integrantes
 
@@ -15,9 +15,11 @@
 4. [Evidencias de implementación](#evidencias-de-implementación)
 5. [Conclusiones](#conclusiones)
 6. [Referencias](#referencias)
+
+
 # Fundamentos teóricos
 # Documentación del diseño
 # Diagramas
 # Evidencias de implementación
 # Conclusiones
-# Referencias
+# Referencias 
