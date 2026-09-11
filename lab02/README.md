@@ -185,7 +185,7 @@ El circuito desarrollado permite seleccionar entre suma y resta utilizando una s
 
 Se define una entrada denominada:
 
-sel
+**sel**
 
 Su funcionamiento es:
 
@@ -195,13 +195,13 @@ sel	Operación
 
 Cuando:
 
-sel = 0
+**sel = 0**
 
 el número B pasa sin modificaciones al circuito.
 
 Cuando:
 
-sel = 1
+**sel = 1**
 
 los bits de B deben invertirse y se utiliza un acarreo inicial igual a 1.
 
@@ -250,7 +250,189 @@ Adicionalmente:
 
 Por esta razón, cuando sel = 1, también se suma automáticamente el 1 necesario para obtener el complemento a dos.
 # Documentación del diseño
+El propósito del laboratorio es implementar un circuito digital capaz de realizar operaciones de suma y resta entre dos números binarios de cuatro bits.
+
+Las entradas principales son:
+
+A[3:0]
+B[3:0]
+sel
+
+El circuito debe seleccionar la operación mediante sel.
+
+sel = 0 → A + B
+sel = 1 → A - B
+
+El diseño se construyó utilizando módulos básicos y lógica combinacional, buscando representar directamente la estructura de hardware correspondiente.
+
+2. Organización modular
+
+Para facilitar el diseño, el sistema puede dividirse en diferentes niveles.
+
+Módulo sumador completo de 1 bit
+
+Es el bloque fundamental.
+
+Entradas:
+
+A
+B
+Cin
+
+Salidas:
+
+S
+Cout
+
+Su función consiste en sumar dos bits y el acarreo proveniente de la posición anterior.
+
+Módulo sumador/restador de 4 bits
+
+El módulo principal utiliza cuatro bloques de suma conectados en cascada.
+
+Las señales de acarreo se propagan de una etapa a otra:
+
+C0 → C1 → C2 → C3 → Cout
+
+El primer acarreo está determinado por la señal de selección:
+
+C0 = sel
+
+De esta manera:
+
+sel = 0 → Cin = 0
+sel = 1 → Cin = 1
+3. Preparación del operando B
+
+Cada bit del operando B pasa por una compuerta XOR junto con la señal sel.
+
+Por ejemplo:
+
+B0_mod = B0 XOR sel
+B1_mod = B1 XOR sel
+B2_mod = B2 XOR sel
+B3_mod = B3 XOR sel
+
+Cuando se realiza una suma:
+
+sel = 0
+
+entonces:
+
+B_mod = B
+
+Cuando se realiza una resta:
+
+sel = 1
+
+entonces:
+
+B_mod = ~B
+
+y el acarreo inicial introduce el +1 correspondiente al complemento a dos.
+
+4. Propagación del acarreo
+
+Los cuatro sumadores están conectados mediante una arquitectura denominada Ripple Carry Adder.
+
+El funcionamiento es:
+
+FA0 → FA1 → FA2 → FA3
+
+Cada sumador genera un acarreo que se convierte en la entrada del siguiente.
+
+De manera simplificada:
+
+FA0:
+A0 + B0 + C0 → S0, C1
+
+FA1:
+A1 + B1 + C1 → S1, C2
+
+FA2:
+A2 + B2 + C2 → S2, C3
+
+FA3:
+A3 + B3 + C3 → S3, Cout
+5. Resultado de la operación
+
+El resultado de la operación se obtiene mediante:
+
+S[3:0]
+
+junto con el acarreo final:
+
+Cout
+
+Para las operaciones que requieren representar cinco bits, puede utilizarse la concatenación:
+
+{Cout, S}
+
+De esta manera, el circuito puede representar correctamente resultados de suma comprendidos entre:
+
+0 y 30
+--- 
+6. *Ejemplo de suma*
+
+Supóngase:
+
+A = 0101 = 5
+B = 0011 = 3
+sel = 0
+
+Como sel = 0, se realiza suma:
+
+  0101
++ 0011
+------
+  1000
+
+Por lo tanto:
+
+5 + 3 = 8
+7. Ejemplo de resta
+
+Supóngase:
+
+A = 0111 = 7
+B = 0011 = 3
+sel = 1
+
+Primero se obtiene el complemento a uno de B:
+
+B  = 0011
+~B = 1100
+
+Luego se suma uno:
+
+1100 + 0001 = 1101
+
+Finalmente:
+
+  0111
++ 1101
+------
+1 0100
+
+Los cuatro bits inferiores representan:
+
+0100 = 4
+
+Por lo tanto:
+
+7 - 3 = 4
 # Diagramas
 # Evidencias de implementación
 # Conclusiones
 # Referencias 
+**[1]** M. M. Mano y M. D. Ciletti, Digital Design: With an Introduction to the Verilog HDL, VHDL, and SystemVerilog, 6th ed. Pearson, 2018.
+
+**[2]** S. Brown y Z. Vranesic, Fundamentals of Digital Logic with Verilog Design, 3rd ed. McGraw-Hill Education, 2014.
+
+**[3]** D. M. Harris y S. L. Harris, Digital Design and Computer Architecture, 2nd ed. Morgan Kaufmann, 2012.
+
+**[4]** IEEE, IEEE Standard for Verilog Hardware Description Language, IEEE Std 1364.
+
+**[5]** Intel Corporation, Quartus Prime Software Documentation, Intel FPGA.
+
+**[6]** Icarus Verilog, Icarus Verilog Documentation, documentación de simulación y compilación de diseños Verilog HDL.
