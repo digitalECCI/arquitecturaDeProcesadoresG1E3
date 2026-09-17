@@ -18,7 +18,8 @@
 
 
 # Fundamentos teóricos
-1. *Sistemas binarios*
+
+**1. *Sistemas binarios***
 
 Los **sistemas digitales** trabajan principalmente con información representada mediante números binarios. A diferencia del sistema decimal, que utiliza diez símbolos del 0 al 9, el sistema binario utiliza únicamente dos valores:
 
@@ -41,7 +42,8 @@ Por lo tanto: 1011₂ = 11₁₀
 
 --- 
 *En circuitos digitales, cada dígito binario se denomina bit. Cuando se agrupan varios bits es posible representar cantidades mayores y realizar operaciones aritméticas directamente mediante circuitos lógicos.*
-2. Suma binaria
+
+**2. Suma binaria**
 
 La suma binaria sigue reglas similares a la suma decimal, pero utiliza únicamente los valores 0 y 1.
 
@@ -55,7 +57,7 @@ A	B	Suma	Acarreo
 
 Cuando se suman tres bits, incluyendo un acarreo de entrada, se utiliza un sumador completo.
 
-3. Sumador completo de 1 bit
+**3. Sumador completo de 1 bit**
 
 Un sumador completo o Full Adder es un circuito combinacional que permite sumar tres entradas binarias:
 
@@ -91,7 +93,7 @@ A	B	Cin	S	Cout
 - - -
 
 
-4. Sumador de 4 bits
+**4. Sumador de 4 bits**
 
 Para realizar operaciones entre números de cuatro bits se pueden conectar cuatro sumadores completos de 1 bit.
 
@@ -124,7 +126,8 @@ equivalente a:
 Por esta razón, el resultado final puede construirse concatenando el acarreo final con los cuatro bits correspondientes a la suma.
 
 {Cout, S}
-5. Resta binaria
+
+**5. Resta binaria**
 
 *Una resta binaria puede implementarse mediante un circuito sumador utilizando el complemento del segundo operando
 
@@ -137,7 +140,8 @@ A - B
 Esta operación puede escribirse mediante complemento a dos como:
 
 A + complemento_a_2(B)
-6. Complemento a uno
+
+**6. Complemento a uno**
 
 El complemento a uno de un número binario se obtiene invirtiendo cada uno de sus bits.
 
@@ -151,7 +155,7 @@ Complemento a uno:
 
 En términos de compuertas digitales, esta operación se realiza mediante compuertas NOT.
 
-7. Complemento a dos
+**7. Complemento a dos**
 
 El complemento a dos se obtiene realizando dos operaciones:
 
@@ -179,7 +183,7 @@ Complemento a 2 de 0101 = 1011
 
 Gracias a este método es posible utilizar el mismo circuito sumador para realizar operaciones de resta.
 
-8. Sumador/Restador
+**8. Sumador/Restador**
 
 El circuito desarrollado permite seleccionar entre suma y resta utilizando una señal de control.
 
@@ -249,6 +253,7 @@ Adicionalmente:
 ***Cin inicial = sel***
 
 Por esta razón, cuando sel = 1, también se suma automáticamente el 1 necesario para obtener el complemento a dos.
+
 # Documentación del diseño
 El propósito del laboratorio es implementar un circuito digital capaz de realizar operaciones de suma y resta entre dos números binarios de cuatro bits.
 
@@ -265,7 +270,7 @@ sel = 1 → A - B
 
 El diseño se construyó utilizando módulos básicos y lógica combinacional, buscando representar directamente la estructura de hardware correspondiente.
 
-2. Organización modular
+**2. Organización modular**
 
 Para facilitar el diseño, el sistema puede dividirse en diferentes niveles.
 
@@ -302,7 +307,8 @@ De esta manera:
 
 sel = 0 → Cin = 0
 sel = 1 → Cin = 1
-3. Preparación del operando B
+
+**3. Preparación del operando B**
 
 Cada bit del operando B pasa por una compuerta XOR junto con la señal sel.
 
@@ -331,7 +337,7 @@ B_mod = ~B
 
 y el acarreo inicial introduce el +1 correspondiente al complemento a dos.
 
-4. Propagación del acarreo
+**4. Propagación del acarreo**
 
 Los cuatro sumadores están conectados mediante una arquitectura denominada Ripple Carry Adder.
 
@@ -354,7 +360,8 @@ A2 + B2 + C2 → S2, C3
 
 FA3:
 A3 + B3 + C3 → S3, Cout
-5. Resultado de la operación
+
+**5. Resultado de la operación**
 
 El resultado de la operación se obtiene mediante:
 
@@ -372,7 +379,7 @@ De esta manera, el circuito puede representar correctamente resultados de suma c
 
 0 y 30
 --- 
-6. *Ejemplo de suma*
+**6. *Ejemplo de suma***
 
 Supóngase:
 
@@ -421,7 +428,10 @@ Los cuatro bits inferiores representan:
 Por lo tanto:
 
 7 - 3 = 4
+
 # Diagramas
+
+
 # Evidencias de implementación
 # Conclusiones
 # Referencias 
