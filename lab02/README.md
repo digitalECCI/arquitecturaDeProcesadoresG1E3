@@ -433,15 +433,17 @@ Por lo tanto:
 # Diagramas
 
 **1.BBCD (Binary Coded Decimal)**
-![alt text](image.png)
 
 BCD significa Décimal Codificado en Binario y representa el sistema de numeración digital en el que podemos representar cada número décimal utilizando 4 bits de números binarios.
 
 Como sabemos hay 10 dígitos en el sistema décimal, para representarlos necesitamos 10 combinaciones de 4 bits binarios.
 
-![alt text](image-1.png)
+
+![alt text](image.png)
 
 Ahora bien, también es posible representar de forma binaria los números décimales del 10 al 15 pero empleando su correspondiente representación en el sistema hexadécimal
+
+![alt text](image-1.png)
 
 
 **2.Display de 7 segmentos**
@@ -480,7 +482,7 @@ Como se evidencia, el bloque tiene un puerto de entrada llamado BCD de 4 bits y 
 
 # Implementación en Verilog
 
-Esta sección explica el código Verilog módulo por módulo, y dentro de cada módulo, bloque por bloque, en el mismo orden jerárquico que se presentó en *Documentación del diseño*: `sumador1b` → `sumador4b` → `sumador_restador4b` → `bin_bcd_1` → `bcd_7seg` → `top_display`.
+Esta sección explica el código Verilog módulo por módulo, y dentro de cada módulo, bloque por bloque, en el mismo orden jerárquico que se presentó en el laboratorio
 
 ## 1. Sumador completo de 1 bit (`sumador1b`)
 
