@@ -431,8 +431,56 @@ Por lo tanto:
 
 # Diagramas
 
+**1.BBCD (Binary Coded Decimal)**
+![alt text](image.png)
+
+BCD significa Décimal Codificado en Binario y representa el sistema de numeración digital en el que podemos representar cada número décimal utilizando 4 bits de números binarios.
+
+Como sabemos hay 10 dígitos en el sistema décimal, para representarlos necesitamos 10 combinaciones de 4 bits binarios.
+
+![alt text](image-1.png)
+
+Ahora bien, también es posible representar de forma binaria los números décimales del 10 al 15 pero empleando su correspondiente representación en el sistema hexadécimal
+
+
+**2.Display de 7 segmentos**
+
+El display de siete segmentos es un dispositivo electrónico que consta de siete diodos emisores de luz (LED) dispuestos en un patrón definido; encender una combinación particular de éstos permite representar un dígito décimal o hexadécimal Existen dos tipos de display LED de siete segmentos:
+
+Tipo de ánodo común: en este tipo de display, todos los ánodos de los siete LEDs están conectados a +Vcc (por lo tanto, ánodo común) y el LED muestra dígitos cuando se suministra un nivel al bajo a los cátodos individuales.
+
+![alt text](image-2.png)
+
+**Primera parte: Diseño BCD a 7seg**
+
+Realizar el diseño, sintentización e implementación del display de 
+7 segmentos, que permita visualizar números en representación hexadécimal en uno de los displays de la tarjeta de desarrollo.
+
+Pasos a seguir:
+
+Definir el bloque funcional del diseño:
+
+![alt text](image-3.png)
+
+Como se evidencia, el bloque tiene un puerto de entrada llamado BCD de 4 bits y un puerto de salida llamado Sseg de 7 bits, lo que concuerda con lo mencionado anteriormente.
+
+2.Definir la descripción funcional del diseño: Tablas de verdad.
+
+3.Describir usando HDL el comportamiento del diseño.
+
+4.Simular el diseño: Implemente un testbench para este fin.
+
+5.Implementación: en la tarjeta correspondiente implemente y valide el funcionamiento.
+
+**Segunda parte: Visualización dinámica en 3 displays de 7 segmentos**
+
+![alt text](image-4.png)
+
 
 # Evidencias de implementación
+
+
+
 # Conclusiones
 # Referencias 
 **[1]** M. M. Mano y M. D. Ciletti, Digital Design: With an Introduction to the Verilog HDL, VHDL, and SystemVerilog, 6th ed. Pearson, 2018.
