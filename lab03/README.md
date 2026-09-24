@@ -1,4 +1,4 @@
-# Lab02 - Sumador/Restador de 4 bits
+# Lab03: Multiplicador de 3 bits usando Máquina de Estados
 
 ## Integrantes
 
