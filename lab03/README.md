@@ -145,6 +145,182 @@ El módulo multiplicador realiza la multiplicación de dos números de 3 bits ca
 
 # Implementación en Verilog
 
+### 1.Multiplicador Secuencial 
+
+`localparam START_STATE = 3'b000;`
+`localparam CHECK       = 3'b001;`
+`localparam ADD         = 3'b010;`
+`localparam SHIFT       = 3'b011;`
+`localparam END_STATE   = 3'b100;`
+
+* `localparam START_STATE = 3'b000;`
+
+Estado inicial de reposo y carga.
+
+Es el punto de partida de la FSM. Permanece en espera hasta recibir el pulso de inicio (start). En este instante limpia el producto y carga los operandos en los registros internos.
+
+* `localparam CHECK = 3'b001;`
+
+Estado de evaluación bit a bit.
+
+Revisa el bit menos significativo del multiplicador (B[0]). Actúa como un nodo de decisión: determina si la FSM debe pasar a acumular una suma o si puede saltarse ese paso.
+
+* `localparam ADD = 3'b010;`
+
+Estado de suma acumulativa.
+
+Se activa únicamente cuando B[0] == 1. Suma el valor actual del multiplicando alineado (A) al registro del producto parcial (pp).
+
+* `localparam SHIFT = 3'b011;`
+
+Estado de desplazamiento aritmético.
+
+Prepara los datos para el siguiente estado. Desplaza el multiplicando a la izquierda (A * 2) y el multiplicador a la derecha (B / 2). Además, verifica si ya no quedan bits por procesar para decidir si finaliza.
+
+* `localparam END_STATE = 3'b100;`
+
+Estado de finalización de la operación.
+
+Señala que el cálculo ha concluido activando la bandera `done`= 1 por un ciclo de reloj, indicando que el resultado en el bus de salida es totalmente válido.
+
+
+**Inicializacion y Carga**
+
+`START_STATE: begin`
+    `done <= 1'b0;`
+    `if (start) begin`
+        `pp <= 8'b00000000;`
+        `A  <= {4'b0000, MD};`
+        `B  <= MR;`
+        `if (MR == 4'b0000)`
+            `state <= END_STATE;`
+        `else`
+            `state <= CHECK;`
+    `end`
+`end`
+
+**Explicacion**
+
+* `done <= 1'b0;`
+ 
+ Mantiene desactivada la bandera de fin de proceso. 
+ 
+ Garantiza que la señal done esté en 0 mientras la máquina se encuentra calculando o esperando.
+ 
+ * `if (start) begin`
+ 
+ Detección de la orden de inicio.
+ 
+ Espera a que el módulo reciba el pulso de arranque enviado por el usuario.
+ 
+ * `pp <= 8'b00000000;`
+ 
+ Limpieza del producto parcial.
+ 
+ Borra cualquier resultado de operaciones anteriores dejando el acumulador en cero.
+ 
+ * `A <= {4'b0000, MD};`
+ 
+ Carga y extensión del multiplicando.
+ 
+ Toma el multiplicando $MD$ de 4 bits y lo extiende a 8 bits agregando ceros a la izquierda para evitar desbordamientos durante los desplazamientos.
+ * `B <= MR;`
+ 
+ Carga del multiplicador.
+ 
+ Copia el valor del multiplicador $MR$ en el registro de trabajo $B$.
+ 
+ * `if (MR == 4'b0000) state <= END_STATE;`
+ 
+ Optimización para casos nulos.
+ 
+ Si el multiplicador es cero ($0 \times MD = 0$), salta directamente al final sin perder ciclos calculando.
+ 
+ * `else state <= CHECK;`
+ 
+ Inicio de ciclo. 
+ 
+ Si el multiplicador es diferente de cero, avanza al estado de evaluación.
+
+ **Evaluacion del Bit**
+
+ `CHECK: begin`
+    `done <= 1'b0;`
+    `if (B[0] == 1'b1)`
+        `state <= ADD;`
+    `else`
+        `state <= SHIFT;`
+`end`
+
+**Explicacion**
+
+* `if (B[0] == 1'b1)` 
+
+Inspección del bit menos significativo.
+
+Evalúa el bit actual en la posición más baja de $B$.
+
+* `state <= ADD;`
+
+Introduccion hacia la suma.Explicación: Si el bit analizado es 1, determina que el valor actual de $A$ debe acumularse en la suma.
+
+* `else state <= SHIFT;`
+
+Introduccion de salto de suma.
+
+Si el bit analizado es 0, ahorra tiempo omitiendo la suma y pasando directo a desplazar.
+
+**Suma y Desplazamiento**
+
+`ADD: begin`
+    `done <= 1'b0;`
+    `pp   <= pp + A;`
+    `state <= SHIFT;`
+`end`
+
+`SHIFT: begin`
+    `done <= 1'b0;`
+    `A    <= A << 1;`
+    `B    <= B_next;`
+
+`if (B_next == 4'b0000)`
+        `state <= END_STATE;`
+`else`
+        `state <= CHECK;`
+`end`
+
+
+**Explicacion**
+
+* `pp <= pp + A;`
+
+Acumulación aritmética.
+
+Suma el valor de $A$ (alineado a la posición de bit actual) dentro del registro del resultado $pp$.
+
+* `A <= A << 1;`
+
+Desplazamiento a la izquierda de $A$.
+
+Equivale a multiplicar el valor actual de $A$ por $2$ para la siguiente posición de bit.
+
+* `B <= B_next;`
+
+Desplazamiento a la derecha de $B$.
+
+Elimina el bit recién procesado ($B/2$) acercando el siguiente bit a la posición $0$.
+
+* `if (B_next == 4'b0000) state <= END_STATE;`
+
+Detección del fin de bits útiles.
+
+Si ya no quedan unos por procesar en $B$, concluye la multiplicación saltando a END_STATE.
+
+* `else state <= CHECK;`
+
+Bucle de iteración.
+
+Retorna al estado de evaluación para analizar el siguiente bit de $B$.
 
 # Evidencias de Implementacion
 
