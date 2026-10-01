@@ -75,6 +75,13 @@ En este diseño, la lógica secuencial permite:
 
 * Llevar el conteo de los 3 ciclos requeridos para completar la multiplicación.
 
+### 3. Lógica secuencial y Módulos de Soporte
+
+* **Sincronización y Anti-rebote:** Permite procesar las pulsaciones del botón mecánico de inicio (`KEY_start`) mediante un contador debouncer para prevenir múltiples disparos.
+
+* **Conversión BCD (Double Dabble):** Algoritmo en lógica combinacional que convierte la salida binaria de 6 bits a formato BCD (decenas y unidades) mediante desplazamientos e incrementos condicionales (`+3` si el valor $\ge 5$).
+
+* **Decodificador a 7 Segmentos:** Traduce los dígitos BCD a la codificación de displays de ánodo común en la FPGA.
 
 # Documentación del diseño
 
