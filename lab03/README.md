@@ -147,11 +147,13 @@ El módulo multiplicador realiza la multiplicación de dos números de 3 bits ca
 
 ### 1.Multiplicador Secuencial 
 
-`localparam START_STATE = 3'b000;
-`Plocalparam CHECK       = 3'b001;
-`localparam ADD         = 3'b010;
-`localparam SHIFT       = 3'b011;
-`localparam END_STATE   = 3'b100;
+```verilog
+localparam START_STATE = 3'b000;
+localparam CHECK       = 3'b001;
+localparam ADD         = 3'b010;
+localparam SHIFT       = 3'b011;
+localparam END_STATE   = 3'b100;
+```
 
 * `localparam START_STATE = 3'b000;`
 
@@ -186,18 +188,20 @@ Señala que el cálculo ha concluido activando la bandera `done`= 1 por un ciclo
 
 **Inicializacion y Carga**
 
-`START_STATE: begin`
-    `done <= 1'b0;`
-    `if (start) begin`
-        `pp <= 8'b00000000;`
-        `A  <= {4'b0000, MD};`
-        `B  <= MR;`
-        `if (MR == 4'b0000)`
-            `state <= END_STATE;`
-        `else`
-            `state <= CHECK;`
-    `end`
-`end`
+```verilog
+START_STATE: begin
+    done <= 1'b0;
+    if (start) begin
+        pp <= 8'b00000000;
+        A  <= {4'b0000, MD};
+        B  <= MR;`
+        if (MR == 4'b0000)
+            state <= END_STATE;
+        else
+            state <= CHECK;
+    end
+end
+```
 
 **Explicacion**
 
@@ -244,13 +248,15 @@ Señala que el cálculo ha concluido activando la bandera `done`= 1 por un ciclo
 
  **Evaluacion del Bit**
 
- `CHECK: begin`
-    `done <= 1'b0;`
-    `if (B[0] == 1'b1)`
-        `state <= ADD;`
-    `else`
-        `state <= SHIFT;`
-`end`
+```verilog
+ CHECK: begin
+    done <= 1'b0;
+    if (B[0] == 1'b1)
+        state <= ADD;
+    else
+        state <= SHIFT;
+end
+```
 
 **Explicacion**
 
@@ -272,23 +278,24 @@ Si el bit analizado es 0, ahorra tiempo omitiendo la suma y pasando directo a de
 
 **Suma y Desplazamiento**
 
-`ADD: begin`
-    `done <= 1'b0;`
-    `pp   <= pp + A;`
-    `state <= SHIFT;`
-`end`
+```verilog
+ADD: begin
+    done <= 1'b0;
+    pp   <= pp + A;
+    state <= SHIFT;
+end
 
-`SHIFT: begin`
-    `done <= 1'b0;`
-    `A    <= A << 1;`
-    `B    <= B_next;`
+SHIFT: begin
+    done <= 1'b0;
+    A    <= A << 1;
+    B    <= B_next;
 
-`if (B_next == 4'b0000)`
-        `state <= END_STATE;`
-`else`
-        `state <= CHECK;`
-`end`
-
+if (B_next == 4'b0000)
+        state <= END_STATE;
+else
+        state <= CHECK;
+ end
+```
 
 **Explicacion**
 
