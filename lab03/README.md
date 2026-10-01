@@ -125,8 +125,23 @@ El sistema está estructurado mediante un módulo superior (`top_mult`) que inte
 
 # Diagramas
 
+### 1. Bloque funcional del Multiplicador
 
+![alt text](image-1.png)
 
+El módulo multiplicador realiza la multiplicación de dos números de 3 bits cada uno (MR y MD) de forma secuencial, donde los productos parciales se suman y desplazan a lo largo de varios ciclos de reloj. El resultado final se almacena en pp (producto parcial de 6 bits) y la señal done indica que la multiplicación finalizó.
+
+### 2. Diagrama de flujo del Multiplicador
+
+![alt text](image.png)
+
+### 3. Unidad de control del bloque Multiplicador: Maquina de Estados
+
+![alt text](image-2.png)
+
+### 4. RTL Viewer de la Unidad de control del bloque Multiplicador: Maquina de Estados
+
+![alt text](image-3.png)
 
 # Implementación en Verilog
 
