@@ -146,6 +146,9 @@ El módulo multiplicador realiza la multiplicación de dos números de 3 bits ca
 # Implementación en Verilog
 
 
+# Evidencias de Implementacion
+
+
 # Conclusiones
 
 
