@@ -147,20 +147,11 @@ El módulo multiplicador realiza la multiplicación de dos números de 3 bits ca
 
 ### 1.Multiplicador Secuencial 
 
-# Explicación del Código Verilog por Fragmentos
-
----
-
-## 1. Multiplicador Secuencial (`mult.v`)
-
-### Definición de Estados de la FSM
-
-```verilog
-localparam START_STATE = 3'b000;
-localparam CHECK       = 3'b001;
-localparam ADD         = 3'b010;
-localparam SHIFT       = 3'b011;
-localparam END_STATE   = 3'b100;
+`localparam START_STATE = 3'b000;
+`Plocalparam CHECK       = 3'b001;
+`localparam ADD         = 3'b010;
+`localparam SHIFT       = 3'b011;
+`localparam END_STATE   = 3'b100;
 
 * `localparam START_STATE = 3'b000;`
 
