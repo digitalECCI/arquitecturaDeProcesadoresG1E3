@@ -85,6 +85,43 @@ En este diseño, la lógica secuencial permite:
 
 # Documentación del diseño
 
+El sistema está estructurado mediante un módulo superior (`top_mult`) que integra la Unidad de Control, el Datapath y la interfaz para la FPGA DE10LITE.
+
+### 1. Módulos y Entradas/Salidas del Top Module (`top_mult`)
+
+* **Entradas:**
+  * `clk`: Reloj principal del sistema.
+  * `KEY_reset`: Pulsador para reinicio global del sistema (lógica invertida `~`).
+  * `KEY_start`: Pulsador para iniciar la multiplicación (lógica invertida `~`).
+  * `MD [2:0]`: Switches del Multiplicando (3 bits).
+  * `MR [2:0]`: Switches del Multiplicador (3 bits).
+
+* **Salidas:**
+  * `HEX0 [6:0]`: Bus para el display de 7 segmentos de Unidades.
+  * `HEX1 [6:0]`: Bus para el display de 7 segmentos de Decenas.
+
+
+### 2. Descripción de Estados de la FSM (`mult.v`)
+
+| Estado | Código | Función / Operación | Salida `done` | Transición de Siguiente Estado |
+| :--- | :---: | :--- | :---: | :--- |
+| **`START_STATE`** | `3'b000` | Si `start = 1`, carga $A \leftarrow \{0000, MD\}$, $B \leftarrow MR$ y borra `pp`. | `0` | Si $MR == 0 \rightarrow$ `END_STATE`<br>Si no $\rightarrow$ `CHECK` |
+| **`CHECK`** | `3'b001` | Evalúa el bit menos significativo de $B$ ($B[0]$). | `0` | Si $B[0] == 1 \rightarrow$ `ADD`<br>Si $B[0] == 0 \rightarrow$ `SHIFT` |
+| **`ADD`** | `3'b010` | Acumula la potencia actual: $pp \leftarrow pp + A$. | `0` | Transiciona incondicionalmente a `SHIFT`. |
+| **`SHIFT`** | `3'b011` | Desplaza $A$ a la izquierda (`A << 1`) y $B$ a la derecha (`B_next = B >> 1`). | `0` | Si $B_{next} == 0 \rightarrow$ `END_STATE`<br>Si no $\rightarrow$ `CHECK` |
+| **`END_STATE`** | `3'b100` | Activa el indicador de operación completada. | `1` | Retorna incondicionalmente a `START_STATE`. |
+
+
+### 3. Estructura del Sistema (Módulos Internos)
+
+1. **`antirebote`:** Filtra el ruido mecánico del botón de inicio (`KEY_start`) usando un contador de 20 bits hasta 1,000,000 de ciclos para generar un pulso limpio (`start_pulse`).
+
+2. **`mult`:** Módulo FSM secuencial que ejecuta la multiplicación de 3 bits.
+
+3. **`bin_dec`:** Decodificador de binario a BCD de 6 bits a 2 dígitos utilizando la técnica *Double Dabble*.
+
+4. **`bcd_7seg`:** Convierte los dígitos BCD a código de 7 segmentos (Ánodo común) para los displays `HEX0` y `HEX1`.
+
 
 # Diagramas
 
