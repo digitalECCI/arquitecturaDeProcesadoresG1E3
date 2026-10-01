@@ -20,6 +20,60 @@
 
 # Fundamentos teóricos
 
+## 1. Multiplicación secuencial
+
+La **multiplicación secuencial** procesa los operandos bit a bit a lo largo de varios ciclos de reloj.
+
+En este laboratorio se multiplican dos operandos de 3 bits:
+
+* **Multiplicando ($MD$):** Valor de 3 bits que se sumará repetidamente según corresponda.
+
+* **Multiplicador ($MR$):** Valor de 3 bits cuyos bits individuales determinan si el multiplicando se suma o no.
+
+El algoritmo examina el bit menos significativo ($LSB$) del multiplicador $MR$ en cada ciclo:
+
+* **Si el bit evaluado es `1`:** Se suma el valor de $MD$ a la parte superior del registro acumulador.
+
+* **Si el bit evaluado es `0`:** No se efectúa suma (se suma cero).
+
+* **Desplazamiento:** Posteriormente, se desplaza multiplicador a la derecha (o el multiplicando a la izquierda), preparando el siguiente bit de $MR$.
+
+Este proceso se repite $N$ veces (donde $N=3$ es el ancho de los operandos). El resultado final se almacena en un registro ($PP$) de 6 bits ($2 \times N$), garantizando eficiencia en el uso de recursos lógicos al reutilizar la misma unidad aritmética.
+
+## 2. Máquina de Estados Algorítmica (ASM)
+Una **Máquina de Estados Algorítmica** (ASM) es un modelo  utilizado para diseñar y representar sistemas secuenciales complejos. Modela la interacción entre la **Unidad de Control** y la **Ruta de Datos** (*Datapath*).
+
+Una **Máquina de Estados Algorítmica** (ASM) coordina el flujo de control del multiplicador interactuando con la Ruta de Datos (*Datapath*) mediante las siguientes señales de control y transiciones de estado[cite: 1]:
+
+1. **`START`:** Estado de inicialización[cite: 1]. Mantiene `RESET = 1`, `DONE = 0`, `SH = 0` y `ADD = 0`[cite: 1]. Permanece en este estado mientras `INIT = 0`[cite: 1]. Al activarse `INIT = 1`, pasa al estado `CHECK`.
+
+
+2. **`CHECK`:** Inspecciona el bit menos significativo del multiplicador ($LSB\_B$)[cite: 1]. Mantiene `DONE = 0`, `RESET = 0`, `SH = 0`, `ADD = 0`.
+
+   * Si $LSB\_B = 1$, transiciona al estado `ADD`.
+
+   * Si $LSB\_B = 0$, salta directamente al estado `SHIFT`.
+
+3. **`ADD`:** Habilita la suma acumulativa activando la señal `ADD = 1` (`DONE = 0`, `RESET = 0`, `SH = 0`). Transiciona incondicionalmente a `SHIFT`.
+
+4. **`SHIFT`:** Habilita el desplazamiento a la derecha activando `SH = 1` (`DONE = 0`, `RESET = 0`, `ADD = 0`) y actualiza el contador de iteraciones.
+
+   * Si $Z = 0$ (aún faltan bits por procesar), regresa a `CHECK`.
+
+   * Si $Z = 1$ (se completaron los 3 bits), avanza a `END`.
+
+5. **`END`:** Notifica la finalización de la operación activando `DONE = 1` (`RESET = 0`, `SH = 0`, `ADD = 0`). Transiciona de vuelta a `START` para quedar listo ante una nueva multiplicación.
+
+## 3. Lógica secuencial
+La lógica secuencial se diferencia de la combinacional en que sus salidas dependen tanto de las entradas actuales como de las salidas/estados anteriores acumulados en el tiempo. Utiliza elementos de almacenamiento síncronos (como *flip-flops*) controlados por una señal de reloj (`clk`).
+
+En este diseño, la lógica secuencial permite:
+
+* Mantener el estado actual de la FSMentre los 5 estados del algoritmo (`START`, `CHECK`, `ADD`, `SHIFT`, `END`).
+
+* Preservar el valor acumulado del producto parcial en cada paso.
+
+* Llevar el conteo de los 3 ciclos requeridos para completar la multiplicación.
 
 
 # Documentación del diseño
