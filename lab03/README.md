@@ -329,10 +329,7 @@ Bucle de iteración.
 
 Retorna al estado de evaluación para analizar el siguiente bit de $B$.
 
-# Evidencias de Implementacion
 
-
-# Conclusiones
 
 
 # Referencias 
