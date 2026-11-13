@@ -1256,6 +1256,19 @@ Es importante señalar que el testbench comprueba principalmente el almacenamien
 ## 1. Diagrama general del sistema
 
 ![alt text](image.png)
+Esquema de tutoria con ALU, banco de registros, UART y conexión hacia una terminal PuTTY mediante
+un adaptador USB-UART CP2102.
+El dibujo permite reconocer las señales de control del sistema, así como las conexiones de TX y GND hacia el
+adaptador serial. Para una conexión física deben verificarse los pines y los niveles eléctricos
+correspondientes a la tarjeta y al adaptador utilizados.
+---
+![alt text](image-1.png)
+Dirección de tres bits, señales WE/RE y organización del banco de ocho registros.
+La dirección determina qué registro se escribe o se lee. Los datos almacenados se recuperan y se envían al
+transmisor UART.
+---- 
+![alt text](image-2.png)
+Selección de los operandos A, B o el resultado de la ALU mediante sel_dato.
 ---
 
 # Evidencias de implementación
@@ -1264,9 +1277,9 @@ Es importante señalar que el testbench comprueba principalmente el almacenamien
 
 A continuación, se presenta la evidencia de simulación obtenida durante el desarrollo del laboratorio.
 
-![Simulación ALU](imagenes/simulacion_alu_uart.jpg)
+![alt text](image-3.png)
 
-**Figura 5.** Simulación del módulo principal `top_fpga`.
+
 
 En la captura se observan los siguientes valores:
 
