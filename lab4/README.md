@@ -239,3 +239,56 @@ El banco permite ejecutar dos operaciones principales:
 **Lectura (Read):** recupera el dato almacenado en una dirección.
 
 Para realizar estas operaciones se utilizan señales de control y un decodificador de direcciones.
+## ¿Qué es un multiplexor?
+
+Un **multiplexor**, también conocido como MUX, es un circuito combinacional que permite seleccionar una entrada entre varias opciones disponibles.
+
+La selección depende de un conjunto de señales de control.
+
+En el laboratorio se implementó un multiplexor encargado de determinar qué dato será almacenado en el banco de registros.
+
+Las opciones son:
+
+| **sel_dato** | **Dato seleccionado** |
+|:---:|:---|
+| `00` | Operando A |
+| `01` | Operando B |
+| `10` | Resultado de la ALU |
+| `11` | Valor cero |
+
+Por ejemplo:
+
+```text
+A = 00000101
+B = 00000011
+R = 00001000
+
+sel = 00 → 00000101
+sel = 01 → 00000011
+sel = 10 → 00001000
+sel = 11 → 00000000
+```
+
+En el diseño, los operandos originales de cuatro bits se amplían a ocho bits mediante ceros en las posiciones más significativas.
+
+Esto permite almacenar tanto los operandos como el resultado de la ALU utilizando un mismo bus de datos.
+
+## ¿Qué es un decodificador?
+
+Un **decodificador digital** es un circuito combinacional que recibe un código binario y activa una salida correspondiente a dicho código.
+
+En este laboratorio se desarrolló un decodificador de **3 a 8 líneas**.
+
+Sus tres entradas permiten seleccionar una de las ocho salidas disponibles.
+
+```text
+3 bits de entrada
+
+        ↓
+
+Decodificador 3 a 8
+
+        ↓
+
+8 señales de selección
+```
