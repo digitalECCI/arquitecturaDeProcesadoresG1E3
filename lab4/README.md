@@ -966,3 +966,233 @@ Se transmiten los ocho bits correspondientes al dato.
 **STOP**
 
 Se genera el bit de parada y finaliza la transmisión.
+### 9.4 Fragmento del código
+
+```verilog
+localparam integer DIVISOR = CLOCK_HZ / BAUD;
+
+reg [1:0] state;
+reg [31:0] baud_count;
+reg [2:0] bit_index;
+reg [7:0] shift_reg;
+```
+
+Para transmitir cada bit se utiliza el registro de desplazamiento:
+
+```verilog
+tx <= shift_reg[0];
+
+shift_reg <= {1'b0, shift_reg[7:1]};
+```
+
+Este procedimiento permite transmitir los bits comenzando por el menos significativo.
+
+La señal `busy` indica que el módulo está transmitiendo.
+
+Al finalizar cada trama se activa `tx_done`.
+
+---
+
+## 10. Conversor decimal UART
+
+### 10.1 Descripción
+
+El módulo `uart_dec_sender` convierte los números binarios almacenados en el banco de registros a caracteres decimales ASCII.
+
+Esto permite que los valores sean visualizados correctamente en la terminal PuTTY.
+
+La conversión contempla números entre 0 y 255.
+
+### 10.2 Código Verilog
+
+```verilog
+wire [7:0] h = data / 8'd100;
+wire [7:0] t = (data / 8'd10) % 8'd10;
+wire [7:0] o = data % 8'd10;
+```
+
+Las variables representan:
+
+* `h`: centenas.
+* `t`: decenas.
+* `o`: unidades.
+
+Posteriormente se realiza la conversión a ASCII.
+
+```verilog
+msg[0] <= 8'd48 + h;
+msg[1] <= 8'd48 + t;
+msg[2] <= 8'd48 + o;
+
+msg[3] <= 8'h0D;
+msg[4] <= 8'h0A;
+```
+
+### 10.3 Ejemplo
+
+Si el valor almacenado es:
+
+```text
+Valor decimal = 125
+```
+
+El módulo obtiene:
+
+```text
+Centenas = 1
+Decenas  = 2
+Unidades = 5
+```
+
+Posteriormente transmite:
+
+```text
+'1' '2' '5' CR LF
+```
+
+La terminal puede mostrar:
+
+```text
+125
+```
+
+Además, el circuito elimina los ceros innecesarios a la izquierda.
+
+Por ejemplo:
+
+```text
+Dato = 7
+
+Se transmite "7"
+
+No se transmite "007"
+```
+
+---
+
+## 11. Circuito antirrebote
+
+### 11.1 Descripción
+
+El módulo `antirebote` permite eliminar las transiciones no deseadas generadas por los pulsadores físicos.
+
+Se utiliza para controlar:
+
+* Inicio de la multiplicación.
+* Escritura en el banco de registros.
+* Lectura de los registros.
+
+Cada pulsación válida genera un único pulso de control.
+
+### 11.2 Fragmento del código Verilog
+
+```verilog
+parameter MAX_COUNT = 1_000_000;
+
+reg button_sync1;
+reg button_sync2;
+reg button_state;
+
+reg [19:0] counter;
+```
+
+El circuito utiliza dos registros de sincronización y un contador.
+
+Cuando la entrada cambia, el contador verifica que el nuevo estado permanezca estable.
+
+Una vez comprobada la transición, el sistema genera un pulso válido.
+
+### 11.3 Importancia
+
+La implementación de este módulo permite evitar múltiples operaciones no deseadas.
+
+Esto resulta especialmente importante para el banco de registros, debido a que un rebote podría generar varias solicitudes de escritura o lectura.
+
+---
+
+## 12. Módulo principal top_fpga
+
+### 12.1 Descripción
+
+El módulo `top_fpga` se encarga de conectar todos los componentes del sistema con los dispositivos físicos de la tarjeta FPGA.
+
+Su función es integrar:
+
+* Las señales de entrada.
+* El procesamiento de la ALU.
+* El banco de registros.
+* Los antirrebotes.
+* La conversión decimal.
+* El transmisor UART.
+* Las señales de visualización LED.
+
+### 12.2 Asignación de operandos y controles
+
+```verilog
+wire clk = MAX10_CLK1_50;
+wire rst_n = KEY[0];
+
+wire [3:0] A = SW[3:0];
+wire [3:0] B = SW[7:4];
+
+wire [2:0] opcode = GPIO_IN[2:0];
+
+wire carry_in = GPIO_IN[3];
+
+wire [1:0] sel_dato = GPIO_IN[5:4];
+
+wire [2:0] addr_write = GPIO_IN[8:6];
+wire [2:0] addr_read  = GPIO_IN[8:6];
+```
+
+### 12.3 Salidas LED
+
+```verilog
+assign LEDR[7:0] = result;
+
+assign LEDR[8] = mult_done;
+
+assign LEDR[9] = uart_busy;
+```
+
+Los primeros ocho LED muestran el resultado de la operación seleccionada.
+
+El LED 8 permite identificar la finalización de la multiplicación.
+
+El LED 9 indica cuándo el transmisor UART se encuentra ocupado.
+
+### 12.4 Integración del procesador
+
+```verilog
+top_procesador PROC (
+    .clk(clk),
+    .rst_n(rst_n),
+    .start(start_pulse),
+    .write_n(write_n),
+
+    .A(A),
+    .B(B),
+    .carry_in(carry_in),
+    .opcode(opcode),
+
+    .sel_dato(sel_dato),
+    .addr_write(addr_write),
+    .addr_read(addr_read),
+    .read_en(read_pulse),
+
+    .result(result),
+    .data_read(data_read),
+
+    .zero(zero),
+    .carry_out(carry_out),
+    .overflow(overflow),
+    .negative(negative),
+    .mult_done(mult_done)
+);
+```
+
+De esta manera se establece la comunicación entre la ALU, el selector de datos y el banco de registros.
+
+---
+
+
