@@ -1255,56 +1255,7 @@ Es importante señalar que el testbench comprueba principalmente el almacenamien
 
 ## 1. Diagrama general del sistema
 
-En el siguiente diagrama se presenta la organización de los bloques principales utilizados durante el laboratorio.
-
-![Diagrama general del sistema](imagenes/diagrama_bloques.png)
-
-**Figura 1.** Diagrama general de la ALU, selector de datos, banco de registros y comunicación UART.
-
-La ALU recibe los operandos A y B, ejecuta la operación seleccionada y entrega el resultado al multiplexor.
-
-Posteriormente, el selector determina qué dato será almacenado en el banco.
-
-Finalmente, la información puede recuperarse y enviarse al computador mediante UART.
-
----
-
-## 2. Arquitectura presentada durante la clase
-
-A continuación, se presenta el esquema desarrollado durante la explicación del funcionamiento general del laboratorio.
-
-![Arquitectura del sistema](imagenes/pizarra_arquitectura.jpg)
-
-**Figura 2.** Esquema de integración de la ALU, banco de registros y transmisión UART.
-
-En este diagrama se observa cómo los diferentes módulos se conectan para conformar una estructura de procesamiento y almacenamiento.
-
-También se presenta la conexión de la FPGA con el computador mediante un adaptador USB-UART CP2102.
-
-Para realizar esta conexión se emplean las señales de transmisión y tierra común, verificando los niveles eléctricos y pines correspondientes.
-
----
-
-## 3. Diagrama del banco de registros
-
-![Banco de registros](imagenes/pizarra_banco_registros.jpg)
-
-**Figura 3.** Organización del multiplexor y banco de ocho registros.
-
-El esquema representa el almacenamiento de datos mediante direcciones de tres bits.
-
-También se identifican las señales de escritura y lectura, encargadas de controlar el acceso a cada registro.
-
----
-
-## 4. Diagrama del multiplexor
-
-![Multiplexor](imagenes/pizarra_selector.jpg)
-
-**Figura 4.** Selección de los operandos y del resultado mediante el multiplexor.
-
-Se observa cómo una señal de dos bits permite seleccionar cuál de los valores disponibles será enviado al banco de registros.
-
+![alt text](image.png)
 ---
 
 # Evidencias de implementación
