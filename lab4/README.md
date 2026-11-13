@@ -292,3 +292,73 @@ Decodificador 3 a 8
 
 8 señales de selección
 ```
+El decodificador permite habilitar únicamente el registro que se desea modificar durante una operación de escritura.
+
+## ¿Qué es UART?
+
+La **UART** (*Universal Asynchronous Receiver/Transmitter*) es una interfaz de comunicación serial asíncrona utilizada para transmitir y recibir información entre dispositivos electrónicos.
+
+La comunicación asíncrona no requiere que ambos dispositivos compartan una señal física de reloj.
+
+En este proyecto se implementó un transmisor UART para enviar los datos almacenados en el banco de registros hacia un computador.
+
+La configuración utilizada es:
+
+```text
+Baudios: 9600
+Bits de datos: 8
+Paridad: Ninguna
+Bits de parada: 1
+```
+
+Esta configuración se conoce como **8N1**.
+
+Cada trama enviada contiene:
+
+1. Un bit de inicio.
+2. Ocho bits de información.
+3. Un bit de parada.
+
+```text
+START | D0 D1 D2 D3 D4 D5 D6 D7 | STOP
+```
+
+El bit de inicio corresponde a `0`, mientras que el bit de parada corresponde a `1`.
+
+Los datos se transmiten comenzando por el bit menos significativo.
+
+### Conversión de binario a ASCII
+
+Los registros almacenan números en formato binario.
+
+Sin embargo, para visualizarlos correctamente en una terminal como PuTTY es necesario convertir esos valores en caracteres ASCII.
+
+Por esta razón se desarrolló el módulo `uart_dec_sender`.
+
+Por ejemplo:
+
+```text
+Número almacenado: 54
+
+Representación binaria:
+00110110
+
+Caracteres ASCII enviados:
+'5' '4' CR LF
+```
+
+Los caracteres `CR` y `LF` permiten realizar un salto de línea después de transmitir el número.
+
+## ¿Qué es un circuito antirrebote?
+
+Un circuito **antirrebote** (*debounce*) evita que las variaciones eléctricas de un pulsador mecánico generen múltiples activaciones no deseadas.
+
+Al presionar un botón pueden presentarse cambios rápidos entre los estados lógicos `0` y `1`.
+
+Esto podría provocar varias escrituras o lecturas cuando realmente se desea ejecutar una sola.
+
+Para evitarlo, se implementó un módulo que sincroniza la entrada, verifica su estabilidad y genera un pulso válido de un ciclo de reloj.
+
+En la implementación de la FPGA se emplea un contador configurado para aproximadamente **20 ms** de estabilidad con un reloj de 50 MHz.
+
+---
