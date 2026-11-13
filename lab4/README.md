@@ -362,3 +362,450 @@ Para evitarlo, se implementó un módulo que sincroniza la entrada, verifica su 
 En la implementación de la FPGA se emplea un contador configurado para aproximadamente **20 ms** de estabilidad con un reloj de 50 MHz.
 
 ---
+# Documentación del diseño
+
+## 1. Organización general del sistema
+
+### 1.1 Descripción
+
+El proyecto se desarrolló mediante una estructura modular en Verilog HDL.
+
+El módulo principal es `top_fpga`, encargado de integrar los distintos componentes y establecer la conexión con las entradas y salidas físicas de la FPGA.
+
+El funcionamiento general comprende las siguientes etapas:
+
+```text
+ENTRADAS A Y B
+      |
+      v
+     ALU
+      |
+      v
+SELECTOR DE DATOS
+      |
+      v
+BANCO DE REGISTROS
+      |
+      v
+CONVERSOR DECIMAL
+      |
+      v
+TRANSMISOR UART
+      |
+      v
+COMPUTADOR - PuTTY
+```
+
+Cada bloque cumple una función específica dentro del sistema.
+
+La ALU procesa los operandos, el multiplexor selecciona la información, el banco la almacena y la UART permite enviarla al computador.
+
+### 1.2 Señales de entrada y salida
+
+| **Señal** | **Función** |
+|:---|:---|
+| `MAX10_CLK1_50` | Reloj principal de 50 MHz |
+| `KEY[0]` | Reinicio del sistema |
+| `KEY[1]` | Inicio de la multiplicación |
+| `SW[3:0]` | Operando A |
+| `SW[7:4]` | Operando B |
+| `GPIO_IN[2:0]` | Selección del opcode |
+| `GPIO_IN[3]` | Acarreo de entrada |
+| `GPIO_IN[5:4]` | Selección del dato |
+| `GPIO_IN[8:6]` | Dirección de lectura y escritura |
+| `GPIO_IN[12]` | Control de escritura |
+| `GPIO_IN[13]` | Control de lectura |
+| `LEDR[7:0]` | Resultado de la ALU |
+| `LEDR[8]` | Multiplicación finalizada |
+| `LEDR[9]` | UART ocupada |
+| `GPIO_TX` | Transmisión serial |
+
+---
+
+## 2. Sumador de 1 bit
+
+### 2.1 Descripción
+
+El módulo `sumador1b` permite sumar tres entradas binarias y generar una salida de suma junto con el acarreo correspondiente.
+
+Este módulo constituye la unidad básica para desarrollar el sumador de cuatro bits.
+
+### 2.2 Código Verilog
+
+```verilog
+module sumador1b(
+    input  A,
+    input  B,
+    input  Ci,
+    output S,
+    output Co
+);
+
+    wire w1;
+    wire w2;
+    wire w3;
+
+    xor (S, A, B, Ci);
+
+    and (w1, A, B);
+    and (w2, A, Ci);
+    and (w3, B, Ci);
+
+    or (Co, w1, w2, w3);
+
+endmodule
+```
+
+### 2.3 Funcionamiento
+
+El código utiliza primitivas de Verilog:
+
+* `xor`: calcula el resultado de la suma.
+* `and`: genera los productos lógicos del acarreo.
+* `or`: combina las condiciones que producen el acarreo de salida.
+
+La utilización de primitivas permite representar directamente las compuertas que conforman el circuito.
+
+---
+
+## 3. Sumador de 4 bits
+
+### 3.1 Descripción
+
+Para construir el sumador de cuatro bits se realizó la instanciación de cuatro módulos `sumador1b`.
+
+El acarreo generado por una etapa es utilizado como entrada de la siguiente.
+
+### 3.2 Código Verilog
+
+```verilog
+module sumador4b(
+    input  [3:0] A,
+    input  [3:0] B,
+    input        Ci,
+    output [3:0] So,
+    output       Co
+);
+
+    wire C1;
+    wire C2;
+    wire C3;
+
+    sumador1b FA0(
+        .A(A[0]),
+        .B(B[0]),
+        .Ci(Ci),
+        .S(So[0]),
+        .Co(C1)
+    );
+
+    sumador1b FA1(
+        .A(A[1]),
+        .B(B[1]),
+        .Ci(C1),
+        .S(So[1]),
+        .Co(C2)
+    );
+
+    sumador1b FA2(
+        .A(A[2]),
+        .B(B[2]),
+        .Ci(C2),
+        .S(So[2]),
+        .Co(C3)
+    );
+
+    sumador1b FA3(
+        .A(A[3]),
+        .B(B[3]),
+        .Ci(C3),
+        .S(So[3]),
+        .Co(Co)
+    );
+
+endmodule
+```
+
+### 3.3 Funcionamiento
+
+Cada sumador completo procesa un bit de los operandos.
+
+La operación inicia desde el bit menos significativo y los acarreos se propagan sucesivamente.
+
+De esta manera se obtiene un resultado binario de cuatro bits y un acarreo final.
+
+---
+
+## 4. Sumador/Restador de 4 bits
+
+### 4.1 Descripción
+
+El módulo `sumador_restador4b` permite realizar operaciones de suma y resta utilizando un único circuito sumador.
+
+La señal `sel` determina cuál operación debe ejecutarse.
+
+### 4.2 Código Verilog
+
+```verilog
+module sumador_restador4b(
+    input  [3:0] A,
+    input  [3:0] B,
+    input        sel,
+    input        carry_in,
+
+    output [3:0] So,
+    output       Co
+);
+
+    wire [3:0] B_xor;
+    wire Ci_effective;
+
+    assign Ci_effective = sel ? 1'b1 : carry_in;
+
+    xor (B_xor[0], B[0], sel);
+    xor (B_xor[1], B[1], sel);
+    xor (B_xor[2], B[2], sel);
+    xor (B_xor[3], B[3], sel);
+
+    sumador4b SR(
+        .A(A),
+        .B(B_xor),
+        .Ci(Ci_effective),
+        .So(So),
+        .Co(Co)
+    );
+
+endmodule
+```
+
+### 4.3 Selección de operación
+
+Cuando:
+
+```text
+sel = 0
+```
+
+El circuito realiza una suma y utiliza el valor de `carry_in`.
+
+Cuando:
+
+```text
+sel = 1
+```
+
+El circuito invierte los bits del segundo operando y utiliza un acarreo inicial igual a uno.
+
+Esto permite ejecutar la resta mediante complemento a dos.
+
+---
+
+## 5. Unidad Aritmético-Lógica
+
+### 5.1 Descripción
+
+El módulo `top_ALU` integra las operaciones aritméticas, lógicas y de comparación.
+
+Recibe los operandos `A` y `B`, el código de operación y las señales de control necesarias.
+
+La ALU utiliza diferentes bloques internos y selecciona el resultado correspondiente mediante una estructura `case`.
+
+### 5.2 Código Verilog
+
+La selección de operaciones se implementó mediante el siguiente fragmento:
+
+```verilog
+always @(*) begin
+    case (opcode)
+
+        3'b000:
+            result = {4'b0000, arith_result};
+
+        3'b001:
+            result = {4'b0000, arith_result};
+
+        3'b010:
+            result = mult_result;
+
+        3'b011:
+            result = {4'b0000, compare_result};
+
+        3'b100:
+            result = {3'b000, A, 1'b0};
+
+        3'b101:
+            result = {4'b0000, not_result};
+
+        3'b110:
+            result = {4'b0000, nor_result};
+
+        3'b111:
+            result = {4'b0000, xor_result};
+
+        default:
+            result = 8'b0;
+
+    endcase
+end
+```
+
+### 5.3 Indicadores de estado
+
+Adicionalmente, se implementaron señales para identificar condiciones de los resultados.
+
+| **Señal** | **Función** |
+|:---|:---|
+| `zero` | Indica si el resultado es cero |
+| `carry_out` | Indica el acarreo aritmético |
+| `overflow` | Indica desbordamiento con signo |
+| `negative` | Indica el bit de signo definido por la operación |
+| `mult_done` | Indica la finalización de la multiplicación |
+
+Estas señales permiten interpretar diferentes condiciones producidas durante el procesamiento.
+
+---
+
+## 6. Multiplicador secuencial mediante FSM
+
+### 6.1 Descripción
+
+El módulo `mult` realiza una multiplicación binaria entre dos operandos de cuatro bits.
+
+Para ello se utiliza una máquina de estados que controla las sumas parciales y los desplazamientos.
+
+Se emplean los siguientes registros:
+
+* `A`: multiplicando extendido a ocho bits.
+* `B`: multiplicador de cuatro bits.
+* `pp`: producto parcial de ocho bits.
+* `state`: estado actual de la máquina.
+
+### 6.2 Definición de estados
+
+```verilog
+localparam START_STATE = 3'b000;
+localparam CHECK       = 3'b001;
+localparam ADD         = 3'b010;
+localparam SHIFT       = 3'b011;
+localparam END_STATE   = 3'b100;
+```
+
+### 6.3 Funcionamiento de la FSM
+
+**Estado START_STATE**
+
+Espera la señal `start`.
+
+Cuando recibe esta señal, inicializa el producto parcial y carga los operandos.
+
+```verilog
+if (start) begin
+    pp <= 8'b00000000;
+
+    A <= {4'b0000, MD};
+    B <= MR;
+
+    if (MR == 4'b0000)
+        state <= END_STATE;
+    else
+        state <= CHECK;
+end
+```
+
+**Estado CHECK**
+
+Comprueba el bit menos significativo del multiplicador.
+
+```verilog
+if (B[0] == 1'b1)
+    state <= ADD;
+else
+    state <= SHIFT;
+```
+
+**Estado ADD**
+
+Realiza la suma correspondiente al producto parcial.
+
+```verilog
+pp <= pp + A;
+
+state <= SHIFT;
+```
+
+**Estado SHIFT**
+
+Realiza los desplazamientos necesarios para continuar con el algoritmo.
+
+```verilog
+A <= A << 1;
+B <= B_next;
+
+if (B_next == 4'b0000)
+    state <= END_STATE;
+else
+    state <= CHECK;
+```
+
+**Estado END_STATE**
+
+Indica que la operación terminó.
+
+```verilog
+done <= 1'b1;
+
+state <= START_STATE;
+```
+
+### 6.4 Importancia de la máquina de estados
+
+El uso de una FSM permite dividir la multiplicación en operaciones simples.
+
+Mientras que un sumador combinacional calcula directamente la suma, el multiplicador utiliza varios ciclos del reloj para completar el procedimiento.
+
+Esta implementación permite comprender cómo una unidad de control puede administrar las operaciones secuenciales de un procesador.
+
+---
+
+## 7. Selector de datos
+
+### 7.1 Descripción
+
+El módulo `selector_datos` determina cuál de las entradas disponibles será almacenada en el banco de registros.
+
+Se implementó un multiplexor de cuatro opciones controlado mediante dos bits.
+
+### 7.2 Código Verilog
+
+```verilog
+module selector_datos (
+    input [3:0] A,
+    input [3:0] B,
+    input [7:0] resultado,
+    input [1:0] sel,
+    output reg [7:0] data_in
+);
+
+    always @(*) begin
+        case (sel)
+
+            2'b00:
+                data_in = {4'b0000, A};
+
+            2'b01:
+                data_in = {4'b0000, B};
+
+            2'b10:
+                data_in = resultado;
+
+            2'b11:
+                data_in = 8'b0;
+
+            default:
+                data_in = 8'b0;
+
+        endcase
+    end
+
+endmodule
+```
