@@ -809,3 +809,160 @@ module selector_datos (
 
 endmodule
 ```
+
+### 7.3 Funcionamiento
+
+El selector recibe los operandos A, B y el resultado completo de la ALU.
+
+La señal `sel` selecciona el dato que será entregado al banco de registros.
+
+Esto permite almacenar individualmente los operandos o conservar el resultado de una operación.
+
+---
+
+## 8. Banco de registros
+
+### 8.1 Descripción
+
+El módulo `banco_registros` está compuesto por ocho registros de ocho bits.
+
+La escritura se realiza mediante un decodificador que habilita el registro correspondiente a la dirección seleccionada.
+
+La lectura utiliza una estructura `case` para entregar el contenido del registro solicitado.
+
+### 8.2 Decodificador de 3 a 8
+
+El decodificador se implementó utilizando primitivas de Verilog.
+
+```verilog
+module decodificador3a8(
+    input        enable,
+    input  [2:0] addr,
+    output [7:0] select
+);
+
+    wire n0;
+    wire n1;
+    wire n2;
+
+    not (n0, addr[0]);
+    not (n1, addr[1]);
+    not (n2, addr[2]);
+
+    and (select[0], enable, n2, n1, n0);
+    and (select[1], enable, n2, n1, addr[0]);
+    and (select[2], enable, n2, addr[1], n0);
+    and (select[3], enable, n2, addr[1], addr[0]);
+    and (select[4], enable, addr[2], n1, n0);
+    and (select[5], enable, addr[2], n1, addr[0]);
+    and (select[6], enable, addr[2], addr[1], n0);
+    and (select[7], enable, addr[2], addr[1], addr[0]);
+
+endmodule
+```
+
+### 8.3 Instanciación de registros
+
+Para almacenar los datos se utilizaron ocho instancias del módulo `registro8`.
+
+Ejemplo:
+
+```verilog
+registro8 R0 (
+    .clk(clk),
+    .rst(rst),
+    .write_en(write_select[0]),
+    .data_in(data_in),
+    .data_out(reg0)
+);
+
+registro8 R1 (
+    .clk(clk),
+    .rst(rst),
+    .write_en(write_select[1]),
+    .data_in(data_in),
+    .data_out(reg1)
+);
+```
+
+La estructura continúa de manera equivalente hasta completar los ocho registros.
+
+### 8.4 Lectura de los registros
+
+```verilog
+always @(*) begin
+    data_out = 8'b0;
+
+    if (read_en) begin
+        case (addr_read)
+
+            3'b000: data_out = reg0;
+            3'b001: data_out = reg1;
+            3'b010: data_out = reg2;
+            3'b011: data_out = reg3;
+            3'b100: data_out = reg4;
+            3'b101: data_out = reg5;
+            3'b110: data_out = reg6;
+            3'b111: data_out = reg7;
+
+            default: data_out = 8'b0;
+
+        endcase
+    end
+end
+```
+
+### 8.5 Funcionamiento del banco
+
+Para escribir un dato es necesario seleccionar:
+
+1. El dato mediante el multiplexor.
+2. La dirección mediante `addr_write`.
+3. La habilitación de escritura.
+
+El valor se almacena en el registro seleccionado.
+
+Para leerlo, se selecciona la dirección correspondiente y se activa `read_en`.
+
+El dato recuperado se entrega al siguiente bloque del sistema.
+
+**Nota:** El módulo `registro8` se instancia en el diseño recibido, pero su definición no aparece entre los códigos compartidos. Para completar los archivos fuente del proyecto debe incluirse su implementación original.
+
+---
+
+## 9. Transmisor UART
+
+### 9.1 Descripción
+
+El módulo `uart_tx` permite transmitir información serial hacia un computador o dispositivo externo.
+
+Se utiliza una máquina de estados para controlar las diferentes etapas de transmisión.
+
+La frecuencia del reloj principal es de 50 MHz y la velocidad configurada para la FPGA es de 9600 baudios.
+
+### 9.2 Definición de estados
+
+```verilog
+localparam IDLE  = 2'd0;
+localparam START = 2'd1;
+localparam DATA  = 2'd2;
+localparam STOP  = 2'd3;
+```
+
+### 9.3 Funcionamiento
+
+**IDLE**
+
+El transmisor permanece en reposo y espera una solicitud de envío.
+
+**START**
+
+Se genera el bit de inicio de la trama UART.
+
+**DATA**
+
+Se transmiten los ocho bits correspondientes al dato.
+
+**STOP**
+
+Se genera el bit de parada y finaliza la transmisión.
