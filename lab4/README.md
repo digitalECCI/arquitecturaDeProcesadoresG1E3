@@ -150,3 +150,92 @@ Para realizar ambas operaciones se utiliza una señal de selección.
 | `1` | Resta | NOT B | 1 |
 
 De esta manera, la misma estructura puede ejecutar sumas y restas.
+
+
+## ¿Qué es una máquina de estados finitos?
+
+Una **máquina de estados finitos**, conocida como FSM (*Finite State Machine*), es un sistema secuencial que controla el funcionamiento de un circuito mediante estados definidos.
+
+Cada estado realiza una función específica y determina cuál será el siguiente estado.
+
+En el laboratorio se implementó una FSM para desarrollar la multiplicación binaria.
+
+A diferencia de la suma, que utiliza directamente un circuito combinacional, el multiplicador desarrollado realiza varias operaciones a través de diferentes ciclos de reloj.
+
+Los estados utilizados fueron:
+
+| **Estado** | **Función** |
+|:---|:---|
+| `START_STATE` | Espera la señal de inicio y carga los operandos |
+| `CHECK` | Verifica el bit menos significativo del multiplicador |
+| `ADD` | Realiza la suma parcial |
+| `SHIFT` | Desplaza los operandos |
+| `END_STATE` | Finaliza la multiplicación |
+
+### Funcionamiento de la multiplicación
+
+El algoritmo utilizado corresponde al método de **sumas y desplazamientos**.
+
+Su funcionamiento consiste en examinar los bits del multiplicador.
+
+Cuando el bit menos significativo es `1`, el multiplicando se suma al producto parcial.
+
+Posteriormente:
+
+* El multiplicando se desplaza una posición a la izquierda.
+* El multiplicador se desplaza una posición a la derecha.
+* El procedimiento continúa hasta completar la operación.
+
+Por ejemplo:
+
+```text
+A = 9
+B = 6
+
+9 × 6 = 54
+
+Resultado decimal = 54
+
+Resultado binario = 00110110
+```
+
+La FSM permite controlar correctamente las distintas etapas de la multiplicación.
+
+## ¿Qué es un banco de registros?
+
+Un **banco de registros** es un conjunto de elementos de almacenamiento que permite guardar información binaria y recuperarla posteriormente.
+
+Los registros son componentes fundamentales de los procesadores, debido a que permiten conservar temporalmente operandos, resultados e información de procesamiento.
+
+En este laboratorio se implementó un banco compuesto por:
+
+```text
+8 registros de 8 bits
+```
+
+Por lo tanto, su capacidad total es:
+
+```text
+8 × 8 = 64 bits
+```
+
+Cada registro posee una dirección única representada mediante tres bits.
+
+| **Dirección** | **Registro** |
+|:---:|:---|
+| `000` | Registro 0 |
+| `001` | Registro 1 |
+| `010` | Registro 2 |
+| `011` | Registro 3 |
+| `100` | Registro 4 |
+| `101` | Registro 5 |
+| `110` | Registro 6 |
+| `111` | Registro 7 |
+
+El banco permite ejecutar dos operaciones principales:
+
+**Escritura (Write):** almacena un dato en la dirección seleccionada.
+
+**Lectura (Read):** recupera el dato almacenado en una dirección.
+
+Para realizar estas operaciones se utilizan señales de control y un decodificador de direcciones.
