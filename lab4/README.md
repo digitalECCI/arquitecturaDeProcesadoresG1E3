@@ -1195,4 +1195,59 @@ De esta manera se establece la comunicación entre la ALU, el selector de datos 
 
 ---
 
+## 13. Testbench
 
+### 13.1 Descripción
+
+Para verificar el comportamiento del sistema se desarrolló el módulo `tb_top_fpga`.
+
+El testbench permite aplicar entradas de prueba, generar señales de reloj y observar las respuestas del circuito.
+
+Además, incorpora un receptor UART simulado y un modelo de referencia para comparar los datos almacenados con los valores transmitidos.
+
+### 13.2 Configuración
+
+```verilog
+localparam integer CLOCK_HZ = 50_000_000;
+
+localparam integer BAUD = 1_000_000;
+
+always #10 clk = ~clk;
+```
+
+El reloj tiene un periodo de:
+
+```text
+T = 20 ns
+```
+
+Su frecuencia es:
+
+```text
+f = 50 MHz
+```
+
+Para reducir el tiempo de simulación se aumentó temporalmente la velocidad UART.
+
+En la implementación física se conserva la configuración de 9600 baudios.
+
+### 13.3 Pruebas implementadas
+
+| **Prueba** | **Descripción** |
+|:---:|:---|
+| 1 | Verificación después del reset |
+| 2 | Selección de A, B y resultado |
+| 3 | Escritura en las ocho direcciones |
+| 4 | Sobrescritura de registros |
+| 5 | Ejecución de los ocho opcodes |
+| 6 | Verificación del antirrebote de escritura |
+| 7 | Rechazo de pulsos demasiado cortos |
+| 8 | Verificación del antirrebote de lectura |
+| 9 | Lectura mientras UART está ocupada |
+| 10 | Reset durante una transmisión |
+
+Estas pruebas permiten evaluar diferentes condiciones del funcionamiento del sistema.
+
+Es importante señalar que el testbench comprueba principalmente el almacenamiento y la transmisión de los resultados. Aunque recorre los ocho opcodes, no compara de manera independiente todas las operaciones de la ALU contra valores esperados fijos.
+
+---
