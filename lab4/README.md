@@ -1251,3 +1251,270 @@ Estas pruebas permiten evaluar diferentes condiciones del funcionamiento del sis
 Es importante señalar que el testbench comprueba principalmente el almacenamiento y la transmisión de los resultados. Aunque recorre los ocho opcodes, no compara de manera independiente todas las operaciones de la ALU contra valores esperados fijos.
 
 ---
+# Diagramas
+
+## 1. Diagrama general del sistema
+
+En el siguiente diagrama se presenta la organización de los bloques principales utilizados durante el laboratorio.
+
+![Diagrama general del sistema](imagenes/diagrama_bloques.png)
+
+**Figura 1.** Diagrama general de la ALU, selector de datos, banco de registros y comunicación UART.
+
+La ALU recibe los operandos A y B, ejecuta la operación seleccionada y entrega el resultado al multiplexor.
+
+Posteriormente, el selector determina qué dato será almacenado en el banco.
+
+Finalmente, la información puede recuperarse y enviarse al computador mediante UART.
+
+---
+
+## 2. Arquitectura presentada durante la clase
+
+A continuación, se presenta el esquema desarrollado durante la explicación del funcionamiento general del laboratorio.
+
+![Arquitectura del sistema](imagenes/pizarra_arquitectura.jpg)
+
+**Figura 2.** Esquema de integración de la ALU, banco de registros y transmisión UART.
+
+En este diagrama se observa cómo los diferentes módulos se conectan para conformar una estructura de procesamiento y almacenamiento.
+
+También se presenta la conexión de la FPGA con el computador mediante un adaptador USB-UART CP2102.
+
+Para realizar esta conexión se emplean las señales de transmisión y tierra común, verificando los niveles eléctricos y pines correspondientes.
+
+---
+
+## 3. Diagrama del banco de registros
+
+![Banco de registros](imagenes/pizarra_banco_registros.jpg)
+
+**Figura 3.** Organización del multiplexor y banco de ocho registros.
+
+El esquema representa el almacenamiento de datos mediante direcciones de tres bits.
+
+También se identifican las señales de escritura y lectura, encargadas de controlar el acceso a cada registro.
+
+---
+
+## 4. Diagrama del multiplexor
+
+![Multiplexor](imagenes/pizarra_selector.jpg)
+
+**Figura 4.** Selección de los operandos y del resultado mediante el multiplexor.
+
+Se observa cómo una señal de dos bits permite seleccionar cuál de los valores disponibles será enviado al banco de registros.
+
+---
+
+# Evidencias de implementación
+
+## 1. Simulación de la ALU
+
+A continuación, se presenta la evidencia de simulación obtenida durante el desarrollo del laboratorio.
+
+![Simulación ALU](imagenes/simulacion_alu_uart.jpg)
+
+**Figura 5.** Simulación del módulo principal `top_fpga`.
+
+En la captura se observan los siguientes valores:
+
+```text
+A = 1010₂ = 10₁₀
+
+B = 0101₂ = 5₁₀
+
+opcode = 000
+
+carry_in = 0
+
+result = 00001111₂
+```
+
+La operación correspondiente es:
+
+```text
+      1010
+    + 0101
+    -------
+      1111
+```
+
+Por lo tanto:
+
+```text
+10 + 5 = 15
+```
+
+El resultado hexadecimal observado es:
+
+```text
+0F
+```
+
+Lo anterior permite comprobar que la operación de suma mostrada en la captura genera el valor correcto.
+
+Adicionalmente, se observa actividad en las señales relacionadas con la comunicación UART.
+
+La señal `uart_busy` cambia a estado bajo y se genera un pulso de `uart_done`, comportamiento correspondiente a la finalización de una trama de transmisión.
+
+---
+
+## 2. Resultados esperados de las operaciones
+
+Durante las pruebas programadas se seleccionan los operandos:
+
+```text
+A = 9
+B = 6
+```
+
+Los resultados esperados a partir del código son:
+
+| **Opcode** | **Operación** | **Resultado decimal** | **Hexadecimal** |
+|:---:|:---|:---:|:---:|
+| `000` | Suma | 15 | `0F` |
+| `001` | Resta | 3 | `03` |
+| `010` | Multiplicación | 54 | `36` |
+| `011` | Comparación | 9 | `09` |
+| `100` | Desplazamiento | 18 | `12` |
+| `101` | NOT | 6 | `06` |
+| `110` | NOR | 0 | `00` |
+| `111` | XOR | 15 | `0F` |
+
+Estos valores se obtienen de las operaciones definidas en el código y sirven como referencia para comprobar la simulación.
+
+No representan por sí solos resultados medidos de todas las pruebas.
+
+---
+
+## 3. Escritura y lectura del banco de registros
+
+Una de las verificaciones contempladas consiste en almacenar diferentes valores en las ocho posiciones disponibles.
+
+Mediante el decodificador, cada dato debe escribirse únicamente en la dirección seleccionada.
+
+Posteriormente, al activar la lectura, el circuito debe recuperar el valor correspondiente.
+
+Este procedimiento permite evaluar:
+
+* La selección de direcciones.
+* La habilitación de escritura.
+* La conservación de los datos.
+* La lectura del registro seleccionado.
+* El envío de información hacia UART.
+
+El testbench también contempla sobrescribir una dirección y comprobar que los registros vecinos mantengan sus valores anteriores.
+
+---
+
+## 4. Transmisión UART
+
+La transmisión UART permite convertir los valores recuperados del banco en información legible para un computador.
+
+Por ejemplo, si el banco contiene el resultado:
+
+```text
+9 × 6 = 54
+```
+
+El conversor decimal prepara los caracteres:
+
+```text
+'5' '4' CR LF
+```
+
+Posteriormente, el transmisor UART debe enviar dichos caracteres en tramas independientes.
+
+En una terminal configurada correctamente, el valor esperado sería:
+
+```text
+54
+```
+
+Esta función permite verificar los resultados sin depender únicamente de los indicadores LED de la FPGA.
+
+Para confirmar físicamente la recepción, es necesario anexar una captura de la terminal PuTTY con el valor recibido.
+
+---
+
+## 5. Verificación de antirrebotes
+
+El testbench contempla pruebas para confirmar que los botones de lectura y escritura generen un único pulso válido.
+
+Para ello se simulan transiciones rápidas similares a los rebotes de un interruptor mecánico.
+
+También se introducen pulsos de corta duración que deben ser ignorados.
+
+El propósito de estas pruebas es garantizar que una sola pulsación no genere operaciones repetidas.
+
+---
+
+## 6. Reinicio del sistema
+
+Otra prueba contemplada consiste en activar el reset mientras el transmisor UART se encuentra trabajando.
+
+El comportamiento esperado consiste en regresar la línea de transmisión al estado de reposo y desactivar la señal de ocupación.
+
+Posteriormente, el sistema debe ser capaz de iniciar una nueva transmisión.
+
+Este procedimiento permite evaluar la respuesta de la arquitectura ante una interrupción del funcionamiento normal.
+
+---
+
+## 7. Evidencias adicionales
+
+Para completar la documentación práctica del laboratorio se pueden anexar las siguientes capturas:
+
+* Resultado final de la consola del testbench.
+* Simulación de la multiplicación y la señal `mult_done`.
+* Escritura y lectura de diferentes direcciones.
+* Transmisión UART completa.
+* Recepción de los datos mediante PuTTY.
+* Implementación física del circuito en la FPGA.
+
+Estas evidencias permitirán respaldar las pruebas programadas y los resultados obtenidos.
+
+---
+
+# Conclusiones
+
+* Se comprendió el funcionamiento de una **Unidad Aritmético-Lógica (ALU)** y su importancia dentro de la arquitectura de un procesador, al permitir ejecutar diferentes operaciones mediante un código de control.
+
+* Se implementó una ALU con **ocho operaciones aritméticas y lógicas**, utilizando operandos de cuatro bits y una salida de hasta ocho bits.
+
+* Se reutilizó el circuito **sumador/restador de cuatro bits**, aplicando el complemento a dos para realizar operaciones de resta mediante una estructura de suma binaria.
+
+* Se comprendió la importancia de las **máquinas de estados finitos**, al desarrollar un multiplicador secuencial que utiliza sumas y desplazamientos controlados mediante diferentes estados.
+
+* Se diseñó un **banco de ocho registros de ocho bits**, permitiendo almacenar y recuperar información mediante direcciones binarias.
+
+* Se implementó un **multiplexor**, encargado de seleccionar entre los operandos y el resultado de la ALU antes de almacenar la información.
+
+* Mediante el uso de un **decodificador de tres a ocho líneas** se estableció un mecanismo de selección para habilitar la escritura en una posición específica del banco de registros.
+
+* Se integró un sistema de comunicación **UART**, permitiendo transmitir información binaria mediante un protocolo serial asíncrono.
+
+* Se comprendió la importancia de la **conversión decimal a ASCII**, debido a que permite representar los datos almacenados como números legibles para una terminal serial.
+
+* La implementación de circuitos **antirrebote** permitió incorporar un mecanismo de control para evitar activaciones múltiples provocadas por las transiciones de los pulsadores.
+
+* La simulación presentada permitió comprobar el resultado de la suma **10 + 5 = 15** y observar la finalización de una trama UART.
+
+* El desarrollo del laboratorio permitió integrar conceptos de electrónica digital, lógica combinacional, circuitos secuenciales, direccionamiento, almacenamiento y comunicación, contribuyendo a comprender la estructura funcional de un sistema de procesamiento digital.
+
+---
+
+# Referencias
+
+* **Universidad ECCI.** *Arquitectura de Procesadores - Laboratorio 04: ALU, Banco de Registros y UART*. Material suministrado durante las sesiones de clase.
+
+* **Material de clase.** Diagramas y explicaciones sobre ALU, multiplexores, banco de registros y comunicación UART.
+
+* **Código fuente del laboratorio.** Implementación en Verilog HDL de los módulos `top_fpga`, `top_procesador`, `top_ALU`, `mult`, `banco_registros`, `selector_datos`, `decodificador3a8`, `sumador4b`, `sumador1b`, `uart_tx`, `uart_dec_sender` y `antirebote`.
+
+* **Altera.** [MAX 10 FPGA Developer Center](https://www.altera.com/developers/developer-centers/max-10). Documentación técnica de la familia de dispositivos FPGA MAX 10.
+
+* **Analog Devices.** [UART: A Hardware Communication Protocol](https://www.analog.com/en/resources/analog-dialogue/articles/uart-a-hardware-communication-protocol.html). Fundamentos de la comunicación serial UART.
+
+* **IEEE Standards Association.** [IEEE 1800-2023: SystemVerilog](https://standards.ieee.org/ieee/1800/7743/). Estándar de lenguaje de descripción y verificación de hardware.
